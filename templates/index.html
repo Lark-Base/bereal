@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real水印</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+  </head>
+  <body>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script  type="module" defer>
+      import { bitable } from "{{ url_for('static', filename='js/js-sdk@0.2.4.min.js') }}";
+      let selection = await bitable.base.getSelection();
+      let baseId = selection.baseId;
+      let tableId = selection.tableId;
+      let viewId = selection.viewId;
+
+      $(function(){
+
+        $(".loading_text").html("正在读取视图和字段信息，请稍等...");
+        $(".loading_page").css("display","block");
+
+        // 分组函数
+        function grouping(array, subGroupLength) {
+          let index = 0;
+          let newArray = [];
+          while (index < array.length) {
+            newArray.push(array.slice(index, index += subGroupLength));
+          }
+          return newArray;
+        }
+
+        $(async () => {
+
+          let tableMetaList = await bitable.base.getTableMetaList();
+          tableMetaList.forEach(async (item) => {
+            if(item.id === tableId) {
+              $("#table_list").append('<option label="'+item.name+'" value="'+item.id+'" selected=""></option>');
+            } else {
+              $("#table_list").append('<option label="'+item.name+'" value="'+item.id+'"></option>');
+            }
+          })
+
+          const table = await bitable.base.getTableById(tableId);
+          let fieldMetaList = await table.getFieldMetaList();
+          
+          $("#source_attach_list").html("");
+          $("#target_attach_list").html("");
+          $("#t_submit_list").html("");
+          $("#loc_list").html("");
+          
+          fieldMetaList.forEach((item) => {
+              if(item.type === 17) {
+                $("#source_attach_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
+                $("#target_attach_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
+              }else if(item.type === 5 || item.type === 1001) {
+                $("#t_submit_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
+              }else if(item.type === 22) {
+                $("#loc_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
+              }
+          })
+
+          $(".loading_page").css("display","none");
+
+          $("#table_list").change(async function() {
+            $(".loading_text").html("正在读取视图和字段信息，请稍等...");
+            $(".loading_page").css("display","block");
+
+            tableId = $("#table_list")[0].value;
+            const table = await bitable.base.getTableById(tableId);
+
+
+            let fieldMetaList = await table.getFieldMetaList();
+
+            $("#source_attach_list").html("");
+            $("#target_attach_list").html("");
+            $("#t_submit_list").html("");
+            $("#loc_list").html("");
+
+            fieldMetaList.forEach((item) => {
+                if(item.type === 17) {
+                  $("#source_attach_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
+                  $("#target_attach_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
+                }else if(item.type === 5 || item.type === 1001) {
+                  $("#t_submit_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
+                }else if(item.type === 22) {
+                  $("#loc_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
+                }
+            })
+
+            $(".loading_page").css("display","none");
+          })
+
+          $(".btn_save").click(async function() {
+            let t_submit_field = $('#t_submit_list')[0].value;
+            if (!t_submit_field){
+              $('#t_submit_list').focus();
+              alert("请选择提交记录时间字段，用于展示在水印中");
+              return
+            }
+            
+            let source_field = $('#source_attach_list')[0].value;
+            let target_field = $('#target_attach_list')[0].value;
+            if (source_field == target_field){
+              $('#source_attach_list').focus();
+              alert("为保证数据安全，请不要将最终存储附件与源附件设置为同一字段")
+              return
+            }
+            
+            $(".setup_page").show();
+            $(".main_page").hide();
+            $('#tip').html("");
+            $('.demo_img').hide();
+            $('.parameter').html("");
+          }); 
+
+        });
+
+        $(".btn_setup").click(function() {
+          $(".setup_page").hide();
+          $(".main_page").show();
+        });
+
+        $(".btn_generate").click(function() {
+          tableId = $("#table_list")[0].value;
+          let source_field = $('#source_attach_list')[0].value;
+          let target_field = $('#target_attach_list')[0].value;
+          let t_submit_field = $('#t_submit_list')[0].value;
+          let location_field = $('#loc_list')[0].value;
+          
+          const base_token = $("#base_token")[0].value;
+          if(base_token === '') {
+            alert("请输入多维表格授权码");
+            return;
+          }
+          const html_str = `请求方法：POST\n请求URL：` + location.href + `watermark\n\n请求体：\n\nRAW\n\n{
+  "record_id":"第一步新增的记录|记录ID",
+  "app_token":"` + baseId + `",
+  "personal_token":"` + base_token + `",
+  "table_id":"` + tableId + `",
+  "source_field":"` + source_field + `",
+  "target_field":"` + target_field + `",
+  "t_submit_field":"` + t_submit_field + `",
+  "location_field":"` + location_field + `"
+}\n\n`
+          console.log("get html_str", html_str)
+          $(".parameter").html(html_str);
+          $('#tip').html("注意：配置自动化流程时，请将上述结构体中record_id的值“第一步新增的记录|记录ID”更新为真正的记录ID")
+          $('.demo_img').show();
+          localStorage.setItem("parameter_" + baseId + "_" + tableId, html_str);
+          localStorage.setItem("base_token_" + baseId + "_" + tableId, base_token);
+        });
+
+      });
+
+      $(".parameter").html(localStorage.getItem("parameter_" + baseId + "_" + tableId));
+      $(".base_token")[0].value = localStorage.getItem("base_token_" + baseId + "_" + tableId);
+
+    </script>
+
+    <div id="main">
+      <span><a href="./manual">查看帮助</a></span>
+      <div class="main_page">
+        <span id="table_title">数据表</span>
+        <div class="main_form">
+          <select name="table_list" class="table_list" id="table_list">
+          </select>
+        </div>
+
+        <span class="blue_tip">请选择以下内容对应的数据表字段</span>
+        <span id="view_title">记录提交时间（该信息附加到水印）</span>
+        <div class="main_form">
+          <select name="t_submit_list" class="view_list" id="t_submit_list">
+          </select>
+        </div>
+
+        <span id="view_title">地理位置字段（该信息附加到水印，非必填）</span>
+        <div class="main_form">
+          <select name="loc_list" class="view_list" id="loc_list">
+          </select>
+        </div>
+
+        <span id="view_title">需加水印附件（暂只处理其中JPEG，PNG类型图片）</span>
+        <div class="main_form">
+          <select name="source_attach_list" class="view_list" id="source_attach_list">
+          </select>
+        </div>
+
+        <span id="view_title">最终存储附件字段（图片加水印后存储到这里）</span>
+        <div class="main_form">
+          <select name="target_attach_list" class="view_list" id="target_attach_list">
+          </select>
+        </div>
+
+        <div class="btn_submit">
+          <input type="button" id="btn_save" value="选定字段，进入下一步" class="btn_save" >
+        </div>
+      </div>
+
+      <div class="setup_page">
+        <span>多维表格授权码</span>
+        <input type="text" id="base_token" class="base_token" value="" placeholder="请输入授权码">
+
+        <div class="btn_submit">
+          <input type="button" id="btn_generate" value="生成自动化流程链接与参数" class="btn_generate" >
+        </div>
+
+        <textarea type="text" id="parameter" value="" class="parameter" disabled="disabled"></textarea>
+        <span class="tip" id="tip"></span>
+        <img class="demo_img" src="{{ url_for('static', filename='img/record_id_demo.gif')}}"></img>
+
+        <div class="btn_submit">
+          <input type="button" id="btn_setup" value="返回" class="btn_setup" >
+        </div>
+      </div>
+
+      <div class="loading_page">
+        <div class=loading_text id="loading_text">正在加载数据，请稍等...</div>
+      </div>
+
+    </div>
+  </body>
+</html>

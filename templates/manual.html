@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real水印-帮助文档</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+  </head>
+  <body>
+    <span><a href="./">返回设置</a></span>
+    <h2>BeReal是什么</h2>
+    <p>BeReal是一个用于将收集表中用户上传的图片自动添加时间和地理位置水印的插件。</p>
+    <h2>如何使用</h2>
+    <p>本插件需配合多维表格自动化流程使用，请设置在新增记录后触发。</p>
+    <h2>前置条件</h2>
+    <p>1.多维表格中需要有提交时间字段、附件字段（用于用户拍摄图片）、地理位置字段（非必须），为了防止原附件被覆盖，请新增一个附件字段，用于存储最终添加了水印的图片。</p>
+    <h2>操作步骤</h2>
+    <p>1.在插件界面，选定字段，生成配置参数后，复制保存到其他文本编辑其中备用。</p>
+    <p>2.新建自动化流程。</p>
+    <p>3.选择“添加新记录时”触发，选择指定数据表，且“提交时间”不为空。</p>
+    <p>4.在“执行以下操作”配置，请选择“发送HTTP请求”,“请求方法”设置为“POST”, 将第一步中的链接粘贴到入参“请求URL”中，请求体设置为“raw”,将第一步生成的参数复制粘贴到输入框中。注意将记录ID参数按图示替换。
+  </body>
+</html>
