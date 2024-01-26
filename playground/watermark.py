@@ -23,10 +23,6 @@ BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 _FONT_BOLD_PATH = BASE_PATH + '/fonts/SourceHanSansOLD-Bold-2.otf'
 _FONT_PATH = BASE_PATH + "/fonts/SourceHanSansSC-Regular-2.otf"
 
-APP_TOKEN = os.environ['appToken']
-PERSONAL_BASE_TOKEN = os.environ['personalBaseToken']
-TABLE_ID = os.environ['tableID']
-
 WEEKS = [u'星期一', u'星期二', u'星期三', u'星期四', u'星期五', u'星期六', u'星期日']
 _TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
