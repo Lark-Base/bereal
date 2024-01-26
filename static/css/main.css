@@ -187,7 +187,8 @@ svg {
 }
 .demo_img {
   padding-top:20px;
-  width:100%;
+  text-align:center;
+  width:414px;
   max-height:224px;
   height:224px;
 }
