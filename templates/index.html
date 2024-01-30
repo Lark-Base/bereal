@@ -44,12 +44,12 @@
 
           const table = await bitable.base.getTableById(tableId);
           let fieldMetaList = await table.getFieldMetaList();
-          
+
           $("#source_attach_list").html("");
           $("#target_attach_list").html("");
           $("#t_submit_list").html("");
           $("#loc_list").html("");
-          
+
           fieldMetaList.forEach((item) => {
               if(item.type === 17) {
                 $("#source_attach_list").append('<option label="'+item.name+'" data-name="'+item.name+'" value="'+item.id+'"></option>');
@@ -99,7 +99,7 @@
               alert("请选择提交记录时间字段，用于展示在水印中");
               return
             }
-            
+
             let source_field = $('#source_attach_list')[0].value;
             let target_field = $('#target_attach_list')[0].value;
             if (source_field == target_field){
@@ -107,13 +107,13 @@
               alert("为保证数据安全，请不要将最终存储附件与源附件设置为同一字段")
               return
             }
-            
+
             $(".setup_page").show();
             $(".main_page").hide();
             $('#tip').html("");
             $('.demo_img').hide();
             $('.parameter').html("");
-          }); 
+          });
 
         });
 
@@ -128,7 +128,7 @@
           let target_field = $('#target_attach_list')[0].value;
           let t_submit_field = $('#t_submit_list')[0].value;
           let location_field = $('#loc_list')[0].value;
-          
+
           const base_token = $("#base_token")[0].value;
           if(base_token === '') {
             alert("请输入多维表格授权码");
@@ -160,7 +160,7 @@
     </script>
 
     <div id="main">
-      <span><a href="./manual">查看帮助</a></span>
+      <span><a href="https://congxin.feishu.cn/docx/L8GFdwf1LoSQT4xhWy1ci079nWg" target="_blank">查看帮助</a></span>
       <div class="main_page">
         <span id="table_title">数据表</span>
         <div class="main_form">
