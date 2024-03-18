@@ -211,6 +211,7 @@ def gen_watermark(personal_token, app_token, table_id, record_id,
 
   #地理位置
   location = fields.get(field_map.get(location_field))
+  location = location or {}
 
   # 附件
   source_attaches = fields.get(field_map.get(source_field))
