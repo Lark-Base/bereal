@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
   </head>
   <body>
-    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
     <script  type="module" defer>
       import { bitable } from "{{ url_for('static', filename='js/js-sdk@0.2.4.min.js') }}";
       let selection = await bitable.base.getSelection();
